@@ -86,11 +86,12 @@ app.post('/api/easybeer-products', generateLimiter, async (req, res) => {
       if (entrepot && entrepot.degres) {
         for (const degre of entrepot.degres) {
           for (const prod of degre.produits || []) {
-            products.push({ nom: prod.nom });
+            products.push({ nom: prod.nom, tav: parseFloat(prod.degreAlcool) || 0 });
           }
         }
       }
     }
+    products.sort((a, b) => a.nom.localeCompare(b.nom, 'fr'));
     res.json({ products });
   } catch (err) {
     const msg = err.message || '';

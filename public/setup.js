@@ -125,6 +125,25 @@ function bestMatch(cielName) {
   return best;
 }
 
+function getUsedEbNames() {
+  const used = new Set();
+  document.querySelectorAll('.eb-select').forEach(sel => {
+    if (sel.value) used.add(sel.value);
+  });
+  return used;
+}
+
+function refreshAllEbSelects() {
+  const used = getUsedEbNames();
+  document.querySelectorAll('.eb-select').forEach(sel => {
+    const current = sel.value;
+    for (const opt of sel.options) {
+      if (!opt.value) continue; // skip "-- Aucun --"
+      opt.hidden = used.has(opt.value) && opt.value !== current;
+    }
+  });
+}
+
 function createEbSelect(selectedValue) {
   const select = document.createElement('select');
   select.className = 'eb-select';
@@ -137,11 +156,12 @@ function createEbSelect(selectedValue) {
   for (const eb of easyBeerProducts) {
     const opt = document.createElement('option');
     opt.value = eb.nom;
-    opt.textContent = eb.nom;
+    opt.textContent = eb.nom + (eb.tav ? ' (' + eb.tav + '%)' : '');
     select.appendChild(opt);
   }
 
   if (selectedValue) select.value = selectedValue;
+  select.addEventListener('change', refreshAllEbSelects);
   return select;
 }
 
@@ -165,7 +185,7 @@ function createEbMappingCell(initialValues) {
   addBtn.className = 'btn btn-secondary btn-sm';
   addBtn.textContent = '+';
   addBtn.title = 'Ajouter un produit EasyBeer';
-  addBtn.addEventListener('click', () => addEbRow(container, null));
+  addBtn.addEventListener('click', () => { addEbRow(container, null); refreshAllEbSelects(); });
   td.appendChild(addBtn);
 
   return td;
@@ -189,6 +209,7 @@ function addEbRow(container, value) {
     } else {
       select.value = '';
     }
+    refreshAllEbSelects();
   });
   row.appendChild(removeBtn);
 
@@ -239,6 +260,8 @@ function buildMappingTable() {
     tr.appendChild(tdLib);
     tbody.appendChild(tr);
   }
+
+  refreshAllEbSelects();
 }
 
 function saveMapping() {
