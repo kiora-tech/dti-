@@ -4,6 +4,9 @@
 # Dependencies
 node_modules/
 
+# Output files
+output/
+
 # Données brutes API
 *-raw.json
 

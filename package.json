@@ -7,6 +7,5 @@
     "generate": "node src/generate-final.js"
   },
   "author": "BroBrew",
-  "license": "UNLICENSED",
-  "private": true
+  "license": "MIT"
 }
