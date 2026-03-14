@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DTI+ CIEL - Declarations douanieres</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>DTI+ CIEL</h1>
+      <p class="subtitle">Generateur de declarations douanieres pour petites brasseries</p>
+    </header>
+
+    <main>
+      <!-- Identification -->
+      <section class="card">
+        <h2>Identification</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="apiUser">Identifiant API EasyBeer</label>
+            <input type="text" id="apiUser" autocomplete="off" placeholder="Votre identifiant API">
+          </div>
+          <div class="form-group">
+            <label for="apiPass">Mot de passe API EasyBeer</label>
+            <input type="password" id="apiPass" autocomplete="off" placeholder="Votre mot de passe API">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="agrement">Numero d'agrement (accise)</label>
+            <input type="text" id="agrement" placeholder="FRXXXXXXXXXX" pattern="[A-Za-z]{2}[0-9A-Za-z]{11}" maxlength="13">
+          </div>
+        </div>
+        <p class="hint">Les identifiants ne sont jamais stockes. Ils sont utilises uniquement le temps de la generation.</p>
+      </section>
+
+      <!-- Produits -->
+      <section class="card">
+        <h2>Produits CIEL</h2>
+        <div class="table-wrap">
+          <table id="produitsTable">
+            <thead>
+              <tr>
+                <th>Nom du produit</th>
+                <th>TAV (%)</th>
+                <th>Stock initial (hl)</th>
+                <th>Libelle fiscal</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="produitsBody"></tbody>
+          </table>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn btn-secondary" onclick="addProductRow()">+ Ajouter un produit</button>
+          <button type="button" class="btn btn-outline" onclick="loadDefaults()">Charger les produits par defaut</button>
+          <button type="button" class="btn btn-outline" onclick="saveConfig()">Sauvegarder la configuration</button>
+        </div>
+      </section>
+
+      <!-- Periode -->
+      <section class="card">
+        <h2>Periode de generation</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="startDate">Date de debut</label>
+            <input type="month" id="startDate">
+          </div>
+          <div class="form-group">
+            <label for="endDate">Date de fin</label>
+            <input type="month" id="endDate">
+          </div>
+        </div>
+      </section>
+
+      <!-- Generate -->
+      <div class="generate-section">
+        <button type="button" id="generateBtn" class="btn btn-primary btn-lg" onclick="generate()">
+          Generer les fichiers DTI+
+        </button>
+      </div>
+
+      <!-- Status -->
+      <div id="status" class="status hidden"></div>
+    </main>
+
+    <footer>
+      <p>DTI+ CIEL Generator &mdash; Open Source &mdash; <a href="https://github.com/kiora-tech/dti-" target="_blank">GitHub</a></p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

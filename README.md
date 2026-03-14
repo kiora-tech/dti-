@@ -1,63 +1,64 @@
-# DTI+ CIEL - Générateur de déclarations douanières
+# DTI+ CIEL - EasyBeer → Douanes
 
-Génération automatique des fichiers DTI+ au format CIEL pour les petites brasseries françaises.
+Interface web pour generer automatiquement les fichiers DTI+ au format CIEL a partir des donnees EasyBeer, pour les petites brasseries francaises.
 
-## Structure
+## Fonctionnalites
 
-```
-├── output/          # Fichiers XML générés (DTI+ CIEL)
-├── schema/          # Schéma XSD officiel des douanes
-├── src/             # Scripts de génération
-└── README.md
+- Connexion a l'API EasyBeer avec vos identifiants
+- Configuration des produits CIEL (nom, TAV, stock initial, libelle fiscal)
+- Generation des declarations DTI+ mensuelles au format XML
+- Telechargement en ZIP
+- **Aucun stockage des identifiants** : vos credentials sont utilises uniquement en memoire le temps de la generation
+
+## Installation
+
+```bash
+npm install
 ```
 
 ## Utilisation
 
-### Générer les déclarations
+### Interface web
 
 ```bash
-cd src
-node generate-final.js
+npm start
 ```
 
-Le script :
-1. Récupère les données depuis l'API EasyBeer
-2. Applique la réconciliation avec les stocks CIEL
-3. Génère les fichiers XML au format DTI+ CIEL officiel
+Ouvrir http://localhost:3000 dans votre navigateur.
 
-### Format de sortie
+1. Entrer vos identifiants API EasyBeer
+2. Configurer vos produits CIEL (ou utiliser les produits par defaut)
+3. Selectionner la periode de generation
+4. Cliquer sur "Generer les fichiers DTI+"
+5. Le ZIP contenant les fichiers XML se telecharge automatiquement
 
-Les fichiers XML respectent le schéma `ciel-dti-plus_v1.0.24.xsd` des douanes françaises :
-- Namespace : `http://douane.finances.gouv.fr/app/ciel/dtiplus/v1`
-- 15 produits CIEL déclarés
-- Régularisations en `autres-sorties` (sans taxe)
-- Ventes en `sorties-avec-paiement-annee-courante`
+### Ligne de commande (legacy)
 
-## Configuration
-
-1. Copier le fichier d'environnement :
 ```bash
 cp .env.example .env
+# Editer .env avec vos credentials
+npm run generate
 ```
 
-2. Renseigner les credentials dans `.env` :
+## Securite
+
+- Les identifiants API ne sont **jamais stockes** sur le serveur
+- Ils transitent uniquement en memoire durant la requete HTTP
+- La configuration des produits peut etre sauvegardee localement dans le navigateur (sans les identifiants)
+- Communication avec EasyBeer en HTTPS
+
+## Structure
+
 ```
-EASYBEER_API_USER=votre_user
-EASYBEER_API_PASS=votre_password
-AGREMENT=FRXXXXXXXXXX
+├── public/           # Interface web (HTML/CSS/JS)
+├── src/
+│   ├── server.js     # Serveur Express
+│   ├── generator.js  # Logique de generation (module reutilisable)
+│   └── generate-final.js  # Script CLI (legacy)
+├── schema/           # Schema XSD officiel des douanes
+└── output/           # Fichiers generes (CLI uniquement, git-ignored)
 ```
-
-3. Optionnel : modifier le mapping des produits CIEL dans `src/generate-final.js`
-
-## Fichiers générés
-
-- `output/YYYY-MM.xml` : DTI+ mensuelle
-
-## Dépendances
-
-- Node.js 18+
-- Accès API EasyBeer
 
 ## Licence
 
-Usage privé - BroBrew
+MIT - [Kiora Tech](https://github.com/kiora-tech)
