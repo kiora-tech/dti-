@@ -158,7 +158,7 @@ function collectProduits() {
     const inputs = row.querySelectorAll('input');
     const select = row.querySelector('select');
     const nom = inputs[0].value.trim();
-    // Preserve easyBeerNom mapping from setup config
+    // Preserve easyBeerNoms mapping from setup config
     const saved = savedProduits.find(p => p.nom === nom);
     const p = {
       nom,
@@ -166,8 +166,10 @@ function collectProduits() {
       stockInitial: parseFloat(inputs[2].value) || 0,
       libelleFiscal: select.value
     };
-    if (saved && saved.easyBeerNom) {
-      p.easyBeerNom = saved.easyBeerNom;
+    if (saved && saved.easyBeerNoms) {
+      p.easyBeerNoms = saved.easyBeerNoms;
+    } else if (saved && saved.easyBeerNom) {
+      p.easyBeerNoms = [saved.easyBeerNom];
     }
     produits.push(p);
   }

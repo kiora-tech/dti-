@@ -113,17 +113,86 @@ function bestMatch(cielName) {
     const ebLower = eb.nom.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     if (ebLower === lower) return eb.nom;
 
-    // Simple similarity: count common words
     const cielWords = lower.split(/\s+/);
     const ebWords = ebLower.split(/\s+/);
     const common = cielWords.filter(w => ebWords.some(ew => ew.includes(w) || w.includes(ew))).length;
     const score = common / Math.max(cielWords.length, ebWords.length);
-    if (score > bestScore && score > 0.3) {
+    if (score > bestScore && score > 0.5) {
       bestScore = score;
       best = eb.nom;
     }
   }
   return best;
+}
+
+function createEbSelect(selectedValue) {
+  const select = document.createElement('select');
+  select.className = 'eb-select';
+
+  const optNone = document.createElement('option');
+  optNone.value = '';
+  optNone.textContent = '-- Aucun --';
+  select.appendChild(optNone);
+
+  for (const eb of easyBeerProducts) {
+    const opt = document.createElement('option');
+    opt.value = eb.nom;
+    opt.textContent = eb.nom;
+    select.appendChild(opt);
+  }
+
+  if (selectedValue) select.value = selectedValue;
+  return select;
+}
+
+function createEbMappingCell(initialValues) {
+  const td = document.createElement('td');
+  td.className = 'eb-mapping-cell';
+
+  const container = document.createElement('div');
+  container.className = 'eb-selects';
+
+  // Add initial selects
+  const values = initialValues && initialValues.length > 0 ? initialValues : [null];
+  for (const val of values) {
+    addEbRow(container, val);
+  }
+
+  td.appendChild(container);
+
+  const addBtn = document.createElement('button');
+  addBtn.type = 'button';
+  addBtn.className = 'btn btn-secondary btn-sm';
+  addBtn.textContent = '+';
+  addBtn.title = 'Ajouter un produit EasyBeer';
+  addBtn.addEventListener('click', () => addEbRow(container, null));
+  td.appendChild(addBtn);
+
+  return td;
+}
+
+function addEbRow(container, value) {
+  const row = document.createElement('div');
+  row.className = 'eb-select-row';
+
+  const select = createEbSelect(value);
+  row.appendChild(select);
+
+  // Remove button (only if not the first row)
+  const removeBtn = document.createElement('button');
+  removeBtn.type = 'button';
+  removeBtn.className = 'btn btn-danger btn-sm';
+  removeBtn.textContent = '\u00d7';
+  removeBtn.addEventListener('click', () => {
+    if (container.children.length > 1) {
+      row.remove();
+    } else {
+      select.value = '';
+    }
+  });
+  row.appendChild(removeBtn);
+
+  container.appendChild(row);
 }
 
 function buildMappingTable() {
@@ -133,7 +202,7 @@ function buildMappingTable() {
   for (const ciel of cielProducts) {
     const tr = document.createElement('tr');
 
-    // CIEL name (read-only)
+    // CIEL name
     const tdName = document.createElement('td');
     tdName.textContent = ciel.nom;
     tdName.style.fontWeight = '600';
@@ -146,30 +215,11 @@ function buildMappingTable() {
     const tdStock = document.createElement('td');
     tdStock.textContent = ciel.stockFin;
 
-    // EasyBeer mapping dropdown
-    const tdEb = document.createElement('td');
-    const select = document.createElement('select');
-    select.className = 'eb-select';
-
-    const optNone = document.createElement('option');
-    optNone.value = '';
-    optNone.textContent = '-- Aucun --';
-    select.appendChild(optNone);
-
-    for (const eb of easyBeerProducts) {
-      const opt = document.createElement('option');
-      opt.value = eb.nom;
-      opt.textContent = eb.nom;
-      select.appendChild(opt);
-    }
-
-    // Auto-match
+    // EasyBeer mapping (multiple)
     const match = bestMatch(ciel.nom);
-    if (match) select.value = match;
+    const tdEb = createEbMappingCell(match ? [match] : []);
 
-    tdEb.appendChild(select);
-
-    // Libelle fiscal dropdown
+    // Libelle fiscal
     const tdLib = document.createElement('td');
     const selLib = document.createElement('select');
     selLib.className = 'lib-select';
@@ -196,13 +246,19 @@ function saveMapping() {
   const produits = [];
 
   rows.forEach((row, i) => {
-    const ebSelect = row.querySelector('.eb-select');
+    const ebSelects = row.querySelectorAll('.eb-select');
     const libSelect = row.querySelector('.lib-select');
+
+    const easyBeerNoms = [];
+    ebSelects.forEach(sel => {
+      if (sel.value) easyBeerNoms.push(sel.value);
+    });
+
     produits.push({
       nom: cielProducts[i].nom,
       tav: cielProducts[i].tav,
-      stockInitial: cielProducts[i].stockFin, // stock fin becomes stock debut for next period
-      easyBeerNom: ebSelect.value || null,
+      stockInitial: cielProducts[i].stockFin,
+      easyBeerNoms: easyBeerNoms.length > 0 ? easyBeerNoms : null,
       libelleFiscal: libSelect.value
     });
   });

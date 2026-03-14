@@ -153,6 +153,30 @@ function generateXml(periode, produits, agrement) {
 }
 
 /**
+ * Aggregate EasyBeer data from multiple products into one.
+ */
+function aggregateEasyBeer(ebNoms, easyBeerData) {
+  let hasData = false;
+  let stockRestant = 0;
+  let entreesDS = 0;
+  let sortiesVentes = 0;
+  let stockFinal = 0;
+
+  for (const ebNom of ebNoms) {
+    const eb = easyBeerData[ebNom];
+    if (eb) {
+      hasData = true;
+      stockRestant += eb.stockRestant;
+      entreesDS += eb.entreesDS;
+      sortiesVentes += eb.sortiesVentes;
+      stockFinal += eb.stockFinal;
+    }
+  }
+
+  return hasData ? { stockRestant, entreesDS, sortiesVentes, stockFinal } : null;
+}
+
+/**
  * Process a single month: fetch DRM, reconcile stocks, return product data.
  */
 async function processMonth(periode, produitsCiel, stocks, apiUser, apiPass) {
@@ -185,9 +209,12 @@ async function processMonth(periode, produitsCiel, stocks, apiUser, apiPass) {
 
   for (const p of produitsCiel) {
     const nom = p.nom;
-    const ebNom = p.easyBeerNom || nom; // Use mapped name if available
+    // Support multiple EasyBeer products mapped to one CIEL product
+    const ebNoms = p.easyBeerNoms || (p.easyBeerNom ? [p.easyBeerNom] : [nom]);
     const stockDebut = stocks[nom] || 0;
-    const eb = easyBeerData[ebNom];
+
+    // Aggregate data from all mapped EasyBeer products
+    const eb = aggregateEasyBeer(ebNoms, easyBeerData);
 
     let production = 0;
     let ventes = 0;

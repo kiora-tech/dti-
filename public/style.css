@@ -214,6 +214,13 @@ tbody td:nth-child(4) select { min-width: 200px; }
 .status.error { background: var(--danger-bg); color: var(--danger); }
 .status.warning { background: var(--warning-bg); color: #975a16; }
 
+/* Multi-select mapping rows */
+.eb-mapping-cell { min-width: 220px; }
+.eb-selects { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.3rem; }
+.eb-select-row { display: flex; gap: 0.3rem; align-items: center; }
+.eb-select-row select { flex: 1; }
+.btn-sm { padding: 0.2rem 0.5rem; font-size: 0.8rem; }
+
 footer {
   text-align: center;
   padding: 2rem 0 1rem;
