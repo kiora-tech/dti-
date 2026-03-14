@@ -10,18 +10,10 @@ Interface web pour generer automatiquement les fichiers DTI+ au format CIEL a pa
 - Telechargement en ZIP
 - **Aucun stockage des identifiants** : vos credentials sont utilises uniquement en memoire le temps de la generation
 
-## Installation
+## Demarrage rapide (Docker)
 
 ```bash
-npm install
-```
-
-## Utilisation
-
-### Interface web
-
-```bash
-npm start
+docker compose up -d
 ```
 
 Ouvrir http://localhost:3000 dans votre navigateur.
@@ -31,6 +23,13 @@ Ouvrir http://localhost:3000 dans votre navigateur.
 3. Selectionner la periode de generation
 4. Cliquer sur "Generer les fichiers DTI+"
 5. Le ZIP contenant les fichiers XML se telecharge automatiquement
+
+### Sans Docker
+
+```bash
+npm install
+npm start
+```
 
 ### Ligne de commande (legacy)
 
