@@ -1,0 +1,13 @@
+# Dependencies
+node_modules/
+
+# Données brutes API
+*-raw.json
+
+# Fichiers temporaires
+*.tmp
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,12 @@
+{
+  "name": "dti-plus-ciel",
+  "version": "1.0.0",
+  "description": "Générateur DTI+ CIEL pour petites brasseries",
+  "main": "src/generate-final.js",
+  "scripts": {
+    "generate": "node src/generate-final.js"
+  },
+  "author": "BroBrew",
+  "license": "UNLICENSED",
+  "private": true
+}
