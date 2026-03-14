@@ -185,8 +185,9 @@ async function processMonth(periode, produitsCiel, stocks, apiUser, apiPass) {
 
   for (const p of produitsCiel) {
     const nom = p.nom;
+    const ebNom = p.easyBeerNom || nom; // Use mapped name if available
     const stockDebut = stocks[nom] || 0;
-    const eb = easyBeerData[nom];
+    const eb = easyBeerData[ebNom];
 
     let production = 0;
     let ventes = 0;

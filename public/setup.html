@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DTI+ CIEL - Configuration</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>DTI+ CIEL</h1>
+      <p class="subtitle">Configuration initiale - Mapping produits CIEL / EasyBeer</p>
+    </header>
+
+    <main>
+      <!-- Step 1: Upload PDF -->
+      <section class="card" id="step1">
+        <h2>1. Importer une declaration CIEL existante</h2>
+        <p>Exportez votre derniere declaration au format PDF depuis
+          <a href="https://www.douane.gouv.fr/cielinternet/CielInternet.html" target="_blank">CIEL Internet</a>
+          (Consulter &rarr; Exporter PDF), puis importez-la ici.</p>
+        <div class="form-row" style="margin-top:1rem">
+          <div class="form-group">
+            <input type="file" id="pdfFile" accept=".pdf">
+          </div>
+          <div>
+            <button type="button" class="btn btn-primary" id="uploadBtn">Analyser le PDF</button>
+          </div>
+        </div>
+        <div id="pdfStatus" class="status hidden"></div>
+      </section>
+
+      <!-- Step 2: EasyBeer credentials -->
+      <section class="card hidden" id="step2">
+        <h2>2. Charger les produits EasyBeer</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="apiUser">Identifiant API EasyBeer</label>
+            <input type="text" id="apiUser" autocomplete="new-password" placeholder="Votre identifiant API">
+          </div>
+          <div class="form-group">
+            <label for="apiPass">Mot de passe API EasyBeer</label>
+            <input type="password" id="apiPass" autocomplete="new-password" placeholder="Votre mot de passe API">
+          </div>
+        </div>
+        <button type="button" class="btn btn-primary" id="fetchEbBtn">Charger les produits EasyBeer</button>
+        <p class="hint">Les identifiants ne sont jamais stockes.</p>
+        <div id="ebStatus" class="status hidden"></div>
+      </section>
+
+      <!-- Step 3: Mapping -->
+      <section class="card hidden" id="step3">
+        <h2>3. Mapper les produits CIEL &harr; EasyBeer</h2>
+        <p>Pour chaque produit CIEL, selectionnez le produit EasyBeer correspondant. Laissez vide si le produit n'existe pas dans EasyBeer.</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Produit CIEL</th>
+                <th>TAV (%)</th>
+                <th>Stock fin (hl)</th>
+                <th>Produit EasyBeer</th>
+                <th>Libelle fiscal</th>
+              </tr>
+            </thead>
+            <tbody id="mappingBody"></tbody>
+          </table>
+        </div>
+
+        <div class="generate-section">
+          <button type="button" class="btn btn-primary btn-lg" id="saveBtn">Sauvegarder la configuration</button>
+        </div>
+        <div id="saveStatus" class="status hidden"></div>
+      </section>
+    </main>
+
+    <footer>
+      <p><a href="/">Retour a la generation</a> &mdash; DTI+ CIEL Generator &mdash; <a href="https://github.com/kiora-tech/dti-" target="_blank">GitHub</a></p>
+    </footer>
+  </div>
+
+  <script src="setup.js"></script>
+</body>
+</html>

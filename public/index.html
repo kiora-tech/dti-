@@ -11,6 +11,7 @@
     <header>
       <h1>DTI+ CIEL</h1>
       <p class="subtitle">Generateur de declarations douanieres pour petites brasseries</p>
+      <p style="margin-top:0.5rem"><a href="/setup.html" class="btn btn-outline">Configuration (mapping CIEL / EasyBeer)</a></p>
     </header>
 
     <main>
@@ -54,9 +55,9 @@
           </table>
         </div>
         <div class="btn-row">
-          <button type="button" class="btn btn-secondary" onclick="addProductRow()">+ Ajouter un produit</button>
-          <button type="button" class="btn btn-outline" onclick="loadDefaults()">Charger les produits par defaut</button>
-          <button type="button" class="btn btn-outline" onclick="saveConfig()">Sauvegarder la configuration</button>
+          <button type="button" class="btn btn-secondary" id="addProductBtn">+ Ajouter un produit</button>
+          <button type="button" class="btn btn-outline" id="loadDefaultsBtn">Charger les produits par defaut</button>
+          <button type="button" class="btn btn-outline" id="saveConfigBtn">Sauvegarder la configuration</button>
         </div>
       </section>
 
@@ -77,7 +78,7 @@
 
       <!-- Generate -->
       <div class="generate-section">
-        <button type="button" id="generateBtn" class="btn btn-primary btn-lg" onclick="generate()">
+        <button type="button" id="generateBtn" class="btn btn-primary btn-lg">
           Generer les fichiers DTI+
         </button>
       </div>

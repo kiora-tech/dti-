@@ -11,8 +11,12 @@ const path = require('path');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const morgan = require('morgan');
+const multer = require('multer');
 const archiver = require('archiver');
-const { generateAllPeriods, VALID_LIBELLES } = require('./generator');
+const { generateAllPeriods, VALID_LIBELLES, fetchDRM } = require('./generator');
+const { parseCielPdf } = require('./pdf-parser');
+
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 
 const app = express();
 
@@ -46,6 +50,58 @@ const generateLimiter = rateLimit({
 });
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
+
+// Parse CIEL PDF to extract products
+app.post('/api/parse-pdf', upload.single('pdf'), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'Fichier PDF requis' });
+  }
+  try {
+    const result = await parseCielPdf(req.file.buffer);
+    res.json(result);
+  } catch (err) {
+    console.error('PDF parse error:', err.message);
+    res.status(400).json({ error: 'Impossible de lire le PDF. Verifiez qu\'il s\'agit d\'une declaration CIEL.' });
+  }
+});
+
+// Fetch EasyBeer product list (single month to discover products)
+app.post('/api/easybeer-products', generateLimiter, async (req, res) => {
+  const { apiUser, apiPass, date } = req.body;
+
+  if (!apiUser || typeof apiUser !== 'string' || apiUser.length > 500) {
+    return res.status(400).json({ error: 'Identifiant API invalide' });
+  }
+  if (!apiPass || typeof apiPass !== 'string' || apiPass.length > 500) {
+    return res.status(400).json({ error: 'Mot de passe API invalide' });
+  }
+
+  try {
+    const dateISO = date || new Date().toISOString();
+    const result = await fetchDRM(apiUser, apiPass, dateISO);
+
+    const products = [];
+    if (result.objet && result.objet.entrepots) {
+      const entrepot = result.objet.entrepots[0];
+      if (entrepot && entrepot.degres) {
+        for (const degre of entrepot.degres) {
+          for (const prod of degre.produits || []) {
+            products.push({ nom: prod.nom });
+          }
+        }
+      }
+    }
+    res.json({ products });
+  } catch (err) {
+    const msg = err.message || '';
+    if (msg.includes('invalides')) {
+      res.status(401).json({ error: 'Identifiants EasyBeer invalides' });
+    } else {
+      console.error('EasyBeer fetch error:', msg);
+      res.status(502).json({ error: 'Service EasyBeer indisponible' });
+    }
+  }
+});
 
 // Validation helpers
 function validatePeriod(str) {

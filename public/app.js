@@ -107,6 +107,13 @@ function saveConfig() {
   showStatus('Configuration sauvegardee (sans les identifiants)', 'success');
 }
 
+function nextMonth(periode) {
+  const [y, m] = periode.split('-').map(Number);
+  const nm = m === 12 ? 1 : m + 1;
+  const ny = m === 12 ? y + 1 : y;
+  return `${ny}-${String(nm).padStart(2, '0')}`;
+}
+
 function loadConfig() {
   const saved = localStorage.getItem('dtiplus-config');
   if (!saved) return false;
@@ -114,8 +121,17 @@ function loadConfig() {
   try {
     const config = JSON.parse(saved);
     if (config.agrement) document.getElementById('agrement').value = config.agrement;
-    if (config.startDate) document.getElementById('startDate').value = config.startDate;
-    if (config.endDate) document.getElementById('endDate').value = config.endDate;
+
+    // If config comes from setup (has periodeReference), compute start date
+    if (config.periodeReference && !config.startDate) {
+      const start = nextMonth(config.periodeReference);
+      document.getElementById('startDate').value = start;
+      document.getElementById('endDate').value = start;
+    } else {
+      if (config.startDate) document.getElementById('startDate').value = config.startDate;
+      if (config.endDate) document.getElementById('endDate').value = config.endDate;
+    }
+
     if (config.produits && config.produits.length > 0) {
       tbody.innerHTML = '';
       for (const p of config.produits) {
@@ -131,16 +147,29 @@ function loadConfig() {
 
 function collectProduits() {
   const rows = tbody.querySelectorAll('tr');
+  const savedConfig = localStorage.getItem('dtiplus-config');
+  let savedProduits = [];
+  try {
+    if (savedConfig) savedProduits = JSON.parse(savedConfig).produits || [];
+  } catch (e) { /* ignore */ }
+
   const produits = [];
   for (const row of rows) {
     const inputs = row.querySelectorAll('input');
     const select = row.querySelector('select');
-    produits.push({
-      nom: inputs[0].value.trim(),
+    const nom = inputs[0].value.trim();
+    // Preserve easyBeerNom mapping from setup config
+    const saved = savedProduits.find(p => p.nom === nom);
+    const p = {
+      nom,
       tav: parseFloat(inputs[1].value) || 0,
       stockInitial: parseFloat(inputs[2].value) || 0,
       libelleFiscal: select.value
-    });
+    };
+    if (saved && saved.easyBeerNom) {
+      p.easyBeerNom = saved.easyBeerNom;
+    }
+    produits.push(p);
   }
   return produits;
 }
@@ -224,6 +253,12 @@ async function generate() {
     btn.textContent = 'Generer les fichiers DTI+';
   }
 }
+
+// Bind events
+document.getElementById('addProductBtn').addEventListener('click', () => addProductRow());
+document.getElementById('loadDefaultsBtn').addEventListener('click', loadDefaults);
+document.getElementById('saveConfigBtn').addEventListener('click', saveConfig);
+document.getElementById('generateBtn').addEventListener('click', generate);
 
 // Init
 if (!loadConfig()) {
