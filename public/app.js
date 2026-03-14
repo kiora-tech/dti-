@@ -256,10 +256,30 @@ async function generate() {
   }
 }
 
+function exportConfig() {
+  const saved = localStorage.getItem('dtiplus-config');
+  if (!saved) {
+    showStatus('Aucune configuration a exporter', 'error');
+    return;
+  }
+  const config = JSON.parse(saved);
+  const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `dtiplus-config_${config.agrement || 'config'}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showStatus('Configuration exportee', 'success');
+}
+
 // Bind events
 document.getElementById('addProductBtn').addEventListener('click', () => addProductRow());
 document.getElementById('loadDefaultsBtn').addEventListener('click', loadDefaults);
 document.getElementById('saveConfigBtn').addEventListener('click', saveConfig);
+document.getElementById('exportConfigBtn').addEventListener('click', exportConfig);
 document.getElementById('generateBtn').addEventListener('click', generate);
 
 // Init

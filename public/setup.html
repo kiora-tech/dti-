@@ -14,6 +14,21 @@
     </header>
 
     <main>
+      <!-- Import existing config -->
+      <section class="card">
+        <h2>Configuration existante</h2>
+        <p>Vous avez deja une configuration ? Importez-la directement.</p>
+        <div class="form-row">
+          <div class="form-group">
+            <input type="file" id="configFile" accept=".json">
+          </div>
+          <div>
+            <button type="button" class="btn btn-outline" id="importConfigBtn">Importer la config</button>
+          </div>
+        </div>
+        <div id="importStatus" class="status hidden"></div>
+      </section>
+
       <!-- Step 1: Upload PDF -->
       <section class="card" id="step1">
         <h2>1. Importer une declaration CIEL existante</h2>
@@ -69,7 +84,7 @@
         </div>
 
         <div class="generate-section">
-          <button type="button" class="btn btn-primary btn-lg" id="saveBtn">Sauvegarder la configuration</button>
+          <button type="button" class="btn btn-primary btn-lg" id="saveBtn">Sauvegarder et exporter la configuration</button>
         </div>
         <div id="saveStatus" class="status hidden"></div>
       </section>

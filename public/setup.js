@@ -292,13 +292,57 @@ function saveMapping() {
     produits
   };
 
-  localStorage.setItem('dtiplus-config', JSON.stringify(config));
-  showStatus('saveStatus', 'Configuration sauvegardee ! Redirection...', 'success');
+  const json = JSON.stringify(config, null, 2);
 
-  setTimeout(() => { window.location.href = '/'; }, 1500);
+  // Save to localStorage
+  localStorage.setItem('dtiplus-config', json);
+
+  // Download as file
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `dtiplus-config_${config.agrement || 'config'}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  showStatus('saveStatus', 'Configuration sauvegardee et telechargee ! Redirection...', 'success');
+  setTimeout(() => { window.location.href = '/'; }, 2000);
+}
+
+function importConfig() {
+  const fileInput = document.getElementById('configFile');
+  if (!fileInput.files.length) {
+    showStatus('importStatus', 'Selectionnez un fichier JSON', 'error');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const config = JSON.parse(e.target.result);
+
+      if (!config.produits || !Array.isArray(config.produits) || config.produits.length === 0) {
+        throw new Error('Fichier invalide: aucun produit trouve');
+      }
+
+      localStorage.setItem('dtiplus-config', JSON.stringify(config));
+      showStatus('importStatus',
+        `Configuration importee: ${config.produits.length} produits, agrement ${config.agrement || 'non defini'}`,
+        'success');
+
+      setTimeout(() => { window.location.href = '/'; }, 1500);
+    } catch (err) {
+      showStatus('importStatus', 'Erreur: ' + err.message, 'error');
+    }
+  };
+  reader.readAsText(fileInput.files[0]);
 }
 
 // Bind events
 document.getElementById('uploadBtn').addEventListener('click', uploadPdf);
 document.getElementById('fetchEbBtn').addEventListener('click', fetchEasyBeerProducts);
 document.getElementById('saveBtn').addEventListener('click', saveMapping);
+document.getElementById('importConfigBtn').addEventListener('click', importConfig);
