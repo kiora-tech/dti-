@@ -11,6 +11,32 @@ const https = require('https');
 
 const NAMESPACE = 'http://douane.finances.gouv.fr/app/ciel/dtiplus/v1';
 
+const VALID_LIBELLES = [
+  'BIERE_PETITE_BRASSERIE_SUP_2_8',
+  'BIERE_PETITE_BRASSERIE_SUP_18',
+  'BIERE_INF_2_8',
+  'BIERE_INF_2_8_PREMIX',
+  'BIERE_INF_2_8_PREMIX_DOM',
+  'BIERE_SUP_2_8_BRASSERIE_TAUX_NORMAL',
+  'BIERE_SUP_18_BRASSERIE_TAUX_NORMAL',
+  'BIERE_SUP_2_8_BRASSERIE_TAUX_NORMAL_PREMIX',
+  'BIERE_SUP_2_8_BRASSERIE_TAUX_NORMAL_PREMIX_DOM',
+  'BIERE_PETITE_BRASSERIE_SUP_2_8_PREMIX',
+  'BIERE_PETITE_BRASSERIE_SUP_2_8_PREMIX_DOM',
+  'BIERE_SUP_2_8_PETITE_BRASSERIE_10000',
+  'BIERE_SUP_18_PETITE_BRASSERIE_10000',
+  'BIERE_SUP_2_8_PETITE_BRASSERIE_10000_PREMIX',
+  'BIERE_SUP_2_8_PETITE_BRASSERIE_10000_PREMIX_DOM',
+  'BIERE_SUP_2_8_PETITE_BRASSERIE_50000',
+  'BIERE_SUP_18_PETITE_BRASSERIE_50000',
+  'BIERE_SUP_2_8_PETITE_BRASSERIE_50000_PREMIX',
+  'BIERE_SUP_2_8_PETITE_BRASSERIE_50000_PREMIX_DOM',
+  'BIERE_SUP_2_8_PETITE_BRASSERIE_200000',
+  'BIERE_SUP_18_PETITE_BRASSERIE_200000',
+  'BIERE_SUP_2_8_PETITE_BRASSERIE_200000_PREMIX',
+  'BIERE_SUP_2_8_PETITE_BRASSERIE_200000_PREMIX_DOM',
+];
+
 function round5(val) {
   return Math.round(val * 100000) / 100000;
 }
@@ -82,7 +108,7 @@ function generateProduitXml(p) {
   return `
     <produit>
       <libelle-personnalise>${escapeXml(p.nom)}</libelle-personnalise>
-      <libelle-fiscal>${libelle}</libelle-fiscal>
+      <libelle-fiscal>${escapeXml(libelle)}</libelle-fiscal>
       <tav>${p.tav}</tav>
       <observations>${escapeXml(p.observations)}</observations>
       <balance-stock>
@@ -251,7 +277,7 @@ function buildPeriodes(startDate, endDate) {
  * @param {Function} [config.onProgress] - Optional callback(message) for progress updates
  */
 async function generateAllPeriods(config) {
-  const { apiUser, apiPass, agrement, produits, startDate, endDate, onProgress } = config;
+  const { apiUser, apiPass, agrement, produits, startDate, endDate, onProgress, isAborted } = config;
   const periodes = buildPeriodes(startDate, endDate);
 
   if (periodes.length === 0) {
@@ -270,6 +296,8 @@ async function generateAllPeriods(config) {
   const files = [];
 
   for (let i = 0; i < periodes.length; i++) {
+    if (isAborted && isAborted()) break;
+
     const periode = periodes[i];
     if (onProgress) onProgress(`Récupération DRM ${periode}... (${i + 1}/${periodes.length})`);
 
@@ -297,5 +325,6 @@ module.exports = {
   generateProduitXml,
   escapeXml,
   formatVolume,
-  round5
+  round5,
+  VALID_LIBELLES
 };
