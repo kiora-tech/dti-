@@ -35,10 +35,19 @@ Les fichiers XML respectent le schéma `ciel-dti-plus_v1.0.24.xsd` des douanes f
 
 ## Configuration
 
-Modifier dans `src/generate-final.js` :
-- `API_USER` / `API_PASS` : credentials EasyBeer
-- `AGREMENT` : numéro d'agrément douanier
-- `produitsCiel` : mapping des produits CIEL
+1. Copier le fichier d'environnement :
+```bash
+cp .env.example .env
+```
+
+2. Renseigner les credentials dans `.env` :
+```
+EASYBEER_API_USER=votre_user
+EASYBEER_API_PASS=votre_password
+AGREMENT=FRXXXXXXXXXX
+```
+
+3. Optionnel : modifier le mapping des produits CIEL dans `src/generate-final.js`
 
 ## Fichiers générés
 

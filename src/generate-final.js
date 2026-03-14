@@ -7,11 +7,26 @@
 
 const https = require('https');
 const fs = require('fs');
+const path = require('path');
 
-const API_USER = 'REDACTED_USER';
-const API_PASS = 'REDACTED_PASS';
-const AGREMENT = 'FRXXXXXXXXXX';
+// Charger .env
+const envPath = path.join(__dirname, '..', '.env');
+if (fs.existsSync(envPath)) {
+  fs.readFileSync(envPath, 'utf8').split('\n').forEach(line => {
+    const [key, ...val] = line.split('=');
+    if (key && val.length) process.env[key.trim()] = val.join('=').trim();
+  });
+}
+
+const API_USER = process.env.EASYBEER_API_USER;
+const API_PASS = process.env.EASYBEER_API_PASS;
+const AGREMENT = process.env.AGREMENT || 'FRXXXXXXXXXX';
 const NAMESPACE = 'http://douane.finances.gouv.fr/app/ciel/dtiplus/v1';
+
+if (!API_USER || !API_PASS) {
+  console.error('Erreur: EASYBEER_API_USER et EASYBEER_API_PASS requis dans .env');
+  process.exit(1);
+}
 
 // 15 produits CIEL avec stock fin novembre 2024
 const produitsCiel = {
