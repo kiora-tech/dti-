@@ -1,0 +1,8 @@
+services:
+  app:
+    image: registry.kiora.tech/kiora/dti_app:latest
+    restart: unless-stopped
+    ports:
+      - "8102:3000"
+    environment:
+      NODE_ENV: production
