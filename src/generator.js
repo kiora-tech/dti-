@@ -64,11 +64,18 @@ function escapeXml(str) {
 function fetchDRM(apiUser, apiPass, dateISO) {
   return new Promise((resolve, reject) => {
     const auth = Buffer.from(`${apiUser}:${apiPass}`).toString('base64');
-    const postData = JSON.stringify(dateISO);
+    const postData = JSON.stringify({
+      filtre: {
+        idsProduits: [],
+        categoriesFiscales: [],
+        masquerProduitsZero: false
+      },
+      date: dateISO
+    });
 
     const options = {
       hostname: 'api.easybeer.fr',
-      path: '/douane/drm?forceRefresh=false&masquerProduitsZero=false',
+      path: '/douane/drm?forceRefresh=false',
       method: 'POST',
       headers: {
         'Authorization': `Basic ${auth}`,
@@ -351,6 +358,7 @@ module.exports = {
   processMonth,
   generateXml,
   generateProduitXml,
+  aggregateEasyBeer,
   escapeXml,
   formatVolume,
   round5,
